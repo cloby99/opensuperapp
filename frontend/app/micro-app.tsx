@@ -486,7 +486,7 @@ const MicroApp = () => {
 
   // Function to compose an email
   const handleComposeEmail = async (
-    config: MailComposer.MailComposerOptions,
+    config?: MailComposer.MailComposerOptions,
   ) => {
     try {
       if (!config) {
@@ -618,7 +618,7 @@ const MicroApp = () => {
           handleMicroAppVersion();
           break;
         case TOPIC.COMPOSE_EMAIL:
-          await handleComposeEmail(data.config);
+          await handleComposeEmail(data?.config);
           break;
         default:
           console.error("Unknown topic:", topic);
