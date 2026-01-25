@@ -120,7 +120,7 @@ export const injectedJavaScript = `window.nativebridge = {
     requestMicroAppVersion: () => window.ReactNativeWebView.postMessage(JSON.stringify({ topic: "micro_app_version" })),
     resolveMicroAppVersion: (version) => console.log("Micro App Version:", version),
     rejectMicroAppVersion: (err) => console.error("Failed to get Micro App version:", err),
-    requestComposeEmail: (configs) => window.ReactNativeWebView.postMessage(JSON.stringify({ topic: "compose_email", data: { configs } })),
+    requestComposeEmail: (config) => window.ReactNativeWebView.postMessage(JSON.stringify({ topic: "compose_email", data: { config } })),
     resolveComposeEmail: (result) => console.log("Email composed successfully:", result),
     rejectComposeEmail: (err) => console.error("Failed to compose email:", err)
   };`;
