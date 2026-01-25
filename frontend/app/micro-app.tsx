@@ -71,6 +71,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { WebView, WebViewMessageEvent } from "react-native-webview";
 import { useDispatch, useSelector } from "react-redux";
 import * as MailComposer from "expo-mail-composer";
+import * as FileSystem from "expo-file-system";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -485,10 +486,10 @@ const MicroApp = () => {
 
   // Function to compose an email
   const handleComposeEmail = async (
-    options: MailComposer.MailComposerOptions,
+    config: MailComposer.MailComposerOptions,
   ) => {
     try {
-      if (!options) {
+      if (!config) {
         console.error("Missing Required MailComposer configuration.");
         sendResponseToWeb(
           "rejectComposeEmail",
@@ -502,7 +503,23 @@ const MicroApp = () => {
         throw new Error("Mail services are not available on this device");
       }
 
-      const result = await MailComposer.composeAsync(options);
+      // Validate attachments if provided
+      if (config.attachments && config.attachments.length > 0) {
+        for (const attachment of config.attachments) {
+          try {
+            const info = await FileSystem.getInfoAsync(attachment);
+            if (!info.exists) {
+              throw new Error(`Attachment file not found: ${attachment}`);
+            }
+          } catch (error) {
+            throw new Error(
+              `Failed to verify attachment: ${attachment}. ${error instanceof Error ? error.message : ""}`,
+            );
+          }
+        }
+      }
+
+      const result = await MailComposer.composeAsync(config);
       sendResponseToWeb("resolveComposeEmail", result);
     } catch (error) {
       const errMessage =
@@ -599,6 +616,9 @@ const MicroApp = () => {
           break;
         case TOPIC.MICRO_APP_VERSION:
           handleMicroAppVersion();
+          break;
+        case TOPIC.COMPOSE_EMAIL:
+          await handleComposeEmail(data.config);
           break;
         default:
           console.error("Unknown topic:", topic);
