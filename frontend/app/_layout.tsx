@@ -170,7 +170,7 @@ export default function RootLayout() {
             </Stack>
           </PersistGate>
         </Provider>
-        <StatusBar style="auto" />
+        <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       </>
     </ThemeProvider>
   );
